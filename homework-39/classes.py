@@ -117,7 +117,6 @@ class ModelService:
             new_result = pd.DataFrame([y, temp], columns=['y', 'encoded_y'])
             new_result.to_csv('ml/result_labels.csv', index=False)
             y = temp
-            print(y)
 
         if need_best_features:
             # 2. Выберите лучшие 3 признака для обучения
@@ -132,22 +131,13 @@ class ModelService:
 
     @staticmethod
     def model_report(model, x_test, y_test, average='weighted'):
-        # 5. Проведите тестирxвание модели, результатом должно быть число - точность модели (accuracy) на тестовой выборке.
-        # Делаем предсказания на тестовом наборе
         y_pred = model.predict(x_test)
-
-        # Оцениваем точность модели
-        accuracy_eff = accuracy_score(y_test, y_pred)
-        print(f"Правильность (accuracy) модели: {accuracy_eff}")
-
-        precision_eff = precision_score(y_test, y_pred, average=average)
-        print(f"Точность (precision) модели: {precision_eff}")
-
-        recall_eff = recall_score(y_test, y_pred, average=average)
-        print(f"Полнота (recall) модели: {recall_eff}")
-
-        f1_eff = f1_score(y_test, y_pred, average=average)
-        print(f"F1 мера модели: {f1_eff}")
+        return {
+            'accuracy': accuracy_score(y_test, y_pred),
+            'precision': precision_score(y_test, y_pred, average=average),
+            'recall': recall_score(y_test, y_pred, average=average),
+            'f1': f1_score(y_test, y_pred, average=average)
+        }
 
     @staticmethod
     def load_model(path_to_model=''):

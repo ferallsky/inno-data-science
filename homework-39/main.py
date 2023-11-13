@@ -1,4 +1,3 @@
-import json
 from pandas import json_normalize
 from classes import Settings, StudentRepository, ModelService
 from flask import Flask, request, jsonify
@@ -7,7 +6,6 @@ app = Flask(__name__)
 settings = Settings()
 
 
-# Метод для классификации новой квартиры
 @app.route('/classifyStudent', methods=['POST'])
 def classify():
     try:
@@ -28,6 +26,18 @@ def train():
         X_train, X_test, y_train, y_test = ModelService.preprocess_dataset(df, need_best_features=False)
         ModelService.train_model(X_train, y_train, file_to_save=settings.model_path())
         return jsonify({'message': 'model saved'})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+@app.route('/report', methods=['GET'])
+def report():
+    try:
+        model = ModelService.load_model(settings.model_path())
+        df_repo = StudentRepository(settings)
+        df = df_repo.loadOrCreate()
+        X_train, X_test, y_train, y_test = ModelService.preprocess_dataset(df, need_best_features=False)
+        return jsonify(ModelService.model_report(model, X_test, y_test))
     except Exception as e:
         return jsonify({'error': str(e)})
 
